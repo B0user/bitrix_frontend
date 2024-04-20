@@ -224,17 +224,17 @@ const Example = () => {
     onEditingRowSave: handleSaveRecipe,
     renderRowActions: ({ row, staticRowIndex, table }) => (
       <Box sx={{ display: 'flex', gap: '1rem' }}>
-        <Tooltip title="Edit">
+        <Tooltip title="Внести изменения">
           <IconButton onClick={() => table.setEditingRow(row)}>
             <EditIcon />
           </IconButton>
         </Tooltip>
-        <Tooltip title="Delete">
+        <Tooltip title="Удалить">
           <IconButton color="error" onClick={() => openDeleteConfirmModal(row)}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>
-        <Tooltip title="Add Subordinate">
+        <Tooltip title="Добавить составляющий ингридиент">
           <IconButton
             onClick={() => {
               setCreatingRowIndex((staticRowIndex || 0) + 1);
@@ -294,27 +294,37 @@ const Example = () => {
 // CRUD OPERATIONS //
 
 function useCreateRecipe() {
-    const queryClient = useQueryClient();
-  
-    return useMutation({
+  const queryClient = useQueryClient();
+
+  return useMutation({
       mutationFn: async (recipe) => {
-        const response = await axios.post(`${baseUrl}/recipes`, recipe);
-        return response.data;
+          const response = await axios.post(`${baseUrl}/recipes`, recipe);
+          return response.data;
       },
       onMutate: async (newRecipe) => {
-        await queryClient.cancelQueries(['recipes']);
-        const previousRecipes = queryClient.getQueryData(['recipes']);
-        queryClient.setQueryData(['recipes'], (oldRecipes) => [...oldRecipes, {...newRecipe, id: 'temp-id'}]);
-        return { previousRecipes };
+          await queryClient.cancelQueries(['recipes']);
+          const previousRecipes = queryClient.getQueryData(['recipes']);
+          console.log('Previous recipes on mutate:', previousRecipes);  // Debugging line
+          if (!previousRecipes) {
+              // Handle the case where there are no previous recipes
+              previousRecipes = [];
+          }
+          queryClient.setQueryData(['recipes'], (oldRecipes) => [...oldRecipes, {...newRecipe, id: 'temp-id'}]);
+          return { previousRecipes };
       },
       onError: (err, newRecipe, context) => {
-        queryClient.setQueryData(['recipes'], context.previousRecipes);
+          console.error('Error in creating recipe:', err);  // Debugging line
+          console.log('Context in onError:', context);  // Debugging line
+          if (context.previousRecipes) {
+              queryClient.setQueryData(['recipes'], context.previousRecipes);
+          }
       },
       onSettled: () => {
-        queryClient.invalidateQueries(['recipes']);
+          queryClient.invalidateQueries(['recipes']);
       },
-    });
+  });
 }
+
   
 function useGetRecipes() {
 return useQuery({
@@ -393,7 +403,7 @@ const validateRequired = (value) => !!value.length;
 function validateRecipe(recipe) {
   const errors = {};
   if (!recipe.name) {
-    errors.name = 'Name is required';
+    errors.name = 'Имя обязательно';
   }
   return errors;
 }
