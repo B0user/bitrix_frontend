@@ -24,12 +24,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 
-const baseUrl = 'http://136.244.95.57:2700/api';
-
 const axiosPrivate = axios.create({
-  baseURL: 'http://localhost:2700/api',
+  baseURL: 'http://136.244.95.57:2700/api',
   headers: { 'Content-Type': 'application/json' },
-  // Include more configurations as needed
 });
 
 const Example = () => {
@@ -155,6 +152,7 @@ const Example = () => {
     isLoading: isLoadingRecipe,
     error: loadingError,
   } = useGetRecipes();
+
   //call UPDATE hook
   const { mutateAsync: updateRecipe, isPending: isUpdatingRecipe } =
     useUpdateRecipe();
@@ -293,7 +291,6 @@ const Example = () => {
 
   return <MaterialReactTable table={table} />;
 };
-
 
 
 // CRUD OPERATIONS //
