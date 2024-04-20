@@ -332,14 +332,19 @@ function useCreateRecipe() {
   
 function useGetRecipes() {
   return useQuery({
-      queryKey: ['recipes'],
-      queryFn: async () => {
+    queryKey: ['recipes'],
+    queryFn: async () => {
       const response = await axios.get(`${baseUrl}/recipes`);
       return response.data;
-      },
-      refetchOnWindowFocus: false,
+    },
+    refetchOnWindowFocus: false,
+    onError: (error) => {
+      console.error('Error fetching recipes:', error);
+      // Optionally, handle error specifics if necessary
+    },
   });
 }
+
 
 function useUpdateRecipe() {
   const queryClient = useQueryClient();
