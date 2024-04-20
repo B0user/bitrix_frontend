@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import {
   MaterialReactTable,
   createRow,
@@ -24,10 +24,14 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 
+import { fakeData } from './makeData.ts';
+
 const axiosPrivate = axios.create({
   baseURL: 'http://136.244.95.57:2700/api',
   headers: { 'Content-Type': 'application/json' },
 });
+
+
 
 const Example = () => {
   const [creatingRowIndex, setCreatingRowIndex] = useState();
@@ -150,8 +154,10 @@ const Example = () => {
     isError: isLoadingRecipeError,
     isFetching: isFetchingRecipe,
     isLoading: isLoadingRecipe,
-    error: loadingError,
+    error: loadingError
   } = useGetRecipes();
+
+  // Now you can use fetchedRecipes, isLoadingRecipeError, isFetchingRecipe, isLoadingRecipe, and loadingError as before in your component
 
   //call UPDATE hook
   const { mutateAsync: updateRecipe, isPending: isUpdatingRecipe } =
@@ -295,69 +301,100 @@ const Example = () => {
 
 // CRUD OPERATIONS //
 
+// Helper function to find a recipe in the recipe tree
+function findRecipeInTree(recipeId, recipes) {
+  for (let i = 0; i < recipes.length; i++) {
+    if (recipes[i].id === recipeId) {
+      return recipes[i];
+    }
+    if (recipes[i].subRows) {
+      const found = findRecipeInTree(recipeId, recipes[i].subRows);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+// CREATE hook (add a new recipe)
 function useCreateRecipe() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (recipe) => axiosPrivate.post('/recipes', recipe).then((res) => res.data),
-    onMutate: async (newRecipe) => {
-      await queryClient.cancelQueries(['recipes']);
-      const previousRecipes = queryClient.getQueryData(['recipes']) || [];
-      queryClient.setQueryData(['recipes'], [...previousRecipes, { ...newRecipe, id: 'temp-id' }]);  // Temp ID should be replaced by actual ID from response if possible
-      return { previousRecipes };
+    mutationFn: async (recipe) => {
+      console.info('create recipe', recipe);
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+      return Promise.resolve();
     },
-    onError: (err, newRecipe, context) => {
-      queryClient.setQueryData(['recipes'], context.previousRecipes);
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries(['recipes']);
+    onMutate: (newRecipeInfo) => {
+      queryClient.setQueryData(['recipes'], (prevRecipes) => {
+        const prevRecipesCopy = JSON.parse(JSON.stringify(prevRecipes));
+        if (newRecipeInfo.parentId) {
+          const parent = findRecipeInTree(newRecipeInfo.parentId, prevRecipesCopy);
+          if (parent) {
+            parent.subRows = [...(parent.subRows || []), { ...newRecipeInfo, id: `${parent.id}.${(parent.subRows?.length || 0) + 1}` }];
+          }
+        } else {
+          prevRecipesCopy.push({ ...newRecipeInfo, id: `${prevRecipesCopy.length + 1}` });
+        }
+        return [...prevRecipesCopy];
+      });
     },
   });
 }
 
-  
+// READ hook (fetch all recipes)
 function useGetRecipes() {
   return useQuery({
     queryKey: ['recipes'],
-    queryFn: () => axiosPrivate.get('/recipes').then((res) => res.data),
+    queryFn: async () => {
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+      return Promise.resolve(fakeData);
+    },
     refetchOnWindowFocus: false,
   });
 }
 
+// UPDATE hook (update a recipe)
 function useUpdateRecipe() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (recipe) => axiosPrivate.put(`/recipes/${recipe.id}`, recipe).then((res) => res.data),
-    onMutate: async (updatedRecipe) => {
-      await queryClient.cancelQueries(['recipes']);
-      const previousRecipes = queryClient.getQueryData(['recipes']) || [];
-      queryClient.setQueryData(['recipes'], previousRecipes.map(r => r.id === updatedRecipe.id ? { ...r, ...updatedRecipe } : r));
-      return { previousRecipes };
+    mutationFn: async (recipe) => {
+      console.info('update recipe', recipe);
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+      return Promise.resolve();
     },
-    onError: (err, newRecipe, context) => {
-      queryClient.setQueryData(['recipes'], context.previousRecipes);
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries(['recipes']);
+    onMutate: (updatedRecipeInfo) => {
+      queryClient.setQueryData(['recipes'], (prevRecipes) => {
+        let recipe = findRecipeInTree(updatedRecipeInfo.id, prevRecipes);
+        recipe = { ...recipe, ...updatedRecipeInfo };
+        return [...prevRecipes];
+      });
     },
   });
 }
 
-
+// DELETE hook (remove a recipe)
 function useDeleteRecipe() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (recipeId) => axiosPrivate.delete(`/recipes/${recipeId}`).then((res) => res.data),
-    onMutate: async (recipeId) => {
-      await queryClient.cancelQueries(['recipes']);
-      const previousRecipes = queryClient.getQueryData(['recipes']) || [];
-      queryClient.setQueryData(['recipes'], previousRecipes.filter(r => r.id !== recipeId));
-      return { previousRecipes };
+    mutationFn: async (recipeId) => {
+      console.info('delete recipe', recipeId);
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+      return Promise.resolve();
     },
-    onError: (err, recipeId, context) => {
-      queryClient.setQueryData(['recipes'], context.previousRecipes);
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries(['recipes']);
+    onMutate: (recipeId) => {
+      queryClient.setQueryData(['recipes'], (prevRecipes) => {
+        const newRecipes = JSON.parse(JSON.stringify(prevRecipes));
+        const recipe = findRecipeInTree(recipeId, newRecipes);
+        if (recipe) {
+          const parent = findRecipeInTree(recipe.parentId, newRecipes);
+          if (parent) {
+            parent.subRows = parent.subRows.filter((subRecipe) => subRecipe.id !== recipeId);
+          } else {
+            return newRecipes.filter((r) => r.id !== recipeId);
+          }
+        }
+        return [...newRecipes];
+      });
     },
   });
 }

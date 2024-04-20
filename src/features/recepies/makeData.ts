@@ -1,4 +1,4 @@
-export type Ingridients = {
+export type Recipe = {
     id: string;
     name: string;
     bitrix_id: string;
@@ -7,10 +7,10 @@ export type Ingridients = {
     time2: string;
     prep: string;
 
-    subRows?: Ingridients[];
+    subRows?: Recipe[];
   };
   
-  export const fakeData: Ingridients[] = [
+  export const fakeData: Recipe[] = [
     {
       id: '1',
       name: 'Browney',
