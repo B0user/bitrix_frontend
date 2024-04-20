@@ -148,6 +148,7 @@ const Example = () => {
     isError: isLoadingRecipeError,
     isFetching: isFetchingRecipe,
     isLoading: isLoadingRecipe,
+    error: loadingError,
   } = useGetRecipes();
   //call UPDATE hook
   const { mutateAsync: updateRecipe, isPending: isUpdatingRecipe } =
@@ -190,7 +191,7 @@ const Example = () => {
   const table = useMaterialReactTable({
     columns,
     data: fetchedRecipes,
-    createDisplayMode: 'modal', // ('modal', and 'custom' are also available)
+    createDisplayMode: 'row', // ('modal', and 'custom' are also available)
     editDisplayMode: 'modal', // ('modal', 'cell', 'table', and 'custom' are also available)
     enableColumnPinning: true,
     enableEditing: true,
@@ -200,7 +201,7 @@ const Example = () => {
     muiToolbarAlertBannerProps: isLoadingRecipeError
       ? {
           color: 'error',
-          children: 'Error loading data',
+          children: `Error loading data: ${loadingError}`,
         }
       : undefined,
     muiTableContainerProps: {
