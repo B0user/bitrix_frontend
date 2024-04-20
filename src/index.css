@@ -1,0 +1,178 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-family: 'Nunito', sans-serif;
+    font-size: 22px;
+    color: #fff;
+}
+
+body {
+    height: 100%;
+    background-color: #ecf0f1;
+}
+
+.App {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  /* padding: 1rem 0.5rem; */
+}
+
+section {
+    width: 100%;
+    max-width: 420px;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.07);
+    border-radius: 25px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    flex-grow: 1;
+    padding-bottom: 1rem;
+}
+
+a, a:visited {
+    color: #2c3e50;
+}
+
+input[type="text"],
+input[type="password"],
+button,
+textarea {
+  font-family: 'Nunito', sans-serif;
+  font-size: 22px;
+  padding: 0.25rem;
+  border-radius: 0.5rem;
+}
+
+button {
+  padding: 0.5rem;
+}
+
+li {
+    list-style-type: none;
+}
+
+.instructions {
+    font-size: 0.75rem;
+    border-radius: 0.5rem;
+    background: #000;
+    color: #fff;
+    padding: 0.25rem;
+    position: relative;
+    bottom: -10px;
+}
+
+.instructions > svg {
+    margin-right: 0.25rem;
+}
+
+.offscreen {
+    position: absolute;
+    left: -9999px;
+}
+
+.hide {
+    display: none;
+}
+
+.valid {
+    color: limegreen;
+    margin-left: 0.25rem;
+}
+
+.invalid {
+    color: red;
+    margin-left: 0.25rem;
+}
+
+.errmsg {
+    background-color: lightpink;
+    color: firebrick;
+    font-weight: bold;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.line {
+    display: inline-block;
+}
+
+.flexGrow {
+    flex-grow: 1;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+}
+
+
+.persistCheck {
+    font-size: 0.75rem;
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+}
+
+.persistCheck label {
+    margin: 0;
+}
+
+[type="checkbox"] {
+    height: 20px;
+    width: 20px;
+    margin: 0 5px 2px 2px;
+}
+
+.sidebar{
+    width: 280px;
+}
+
+a.nav-link, a.nav-link:hover, a.nav-link:visited, a.nav-link:active, a.nav-link:focus {
+    color: #fff;
+}
+.vl-left-dotted {
+    border-left: 3px dashed #000;
+}
+li>a, button>a {
+    text-decoration: none;
+}
+/* Color Pallete */
+
+.bg-cp-turquosie      { background-color: #1abc9c;}
+.bg-cp-greensea       { background-color: #16a085;}
+.bg-cp-emerald        { background-color: #2ecc71;}
+.bg-cp-nephritis      { background-color: #27ae60;}
+.bg-cp-peterriver     { background-color: #3498db;}
+.bg-cp-belizehole     { background-color: #2980b9;}
+.bg-cp-amethyst       { background-color: #9b59b6;}
+.bg-cp-wisteria       { background-color: #8e44ad;}
+.bg-cp-wetasphalt     { background-color: #34495e;}
+.bg-cp-midnightblue   { background-color: #2c3e50;}
+.bg-cp-sunflower      { background-color: #f1c40f;}
+.bg-cp-orange         { background-color: #f39c12;}
+.bg-cp-carrot         { background-color: #e67e22;}
+.bg-cp-pumpkin        { background-color: #d35400;}
+.bg-cp-alizarin       { background-color: #e74c3c;}
+.bg-cp-pomegranate    { background-color: #c0392b;}
+.bg-cp-clouds         { background-color: #ecf0f1;}
+.bg-cp-silver         { background-color: #bdc3c7;}
+.bg-cp-concrete       { background-color: #95a5a6;}
+.bg-cp-asbestos       { background-color: #7f8c8d;}
+
+.btn-cp, .btn-cp:hover, .btn-cp:visited, .btn-cp:active, .btn-cp:focus, .btn-cp a, .text-white a { color:#fff; }
