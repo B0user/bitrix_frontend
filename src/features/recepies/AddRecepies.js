@@ -326,7 +326,7 @@ function useCreateRecipe() {
 }
 
   
-function useGetRecipes() {
+async function useGetRecipes() {
   return useQuery({
       queryKey: ['recipes'],
       queryFn: async () => {
