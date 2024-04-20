@@ -326,6 +326,26 @@ function useGetRecipes() {
   });
 }
 
+function useUpdateRecipe() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (recipe) => axiosPrivate.put(`/recipes/${recipe.id}`, recipe).then((res) => res.data),
+    onMutate: async (updatedRecipe) => {
+      await queryClient.cancelQueries(['recipes']);
+      const previousRecipes = queryClient.getQueryData(['recipes']) || [];
+      queryClient.setQueryData(['recipes'], previousRecipes.map(r => r.id === updatedRecipe.id ? { ...r, ...updatedRecipe } : r));
+      return { previousRecipes };
+    },
+    onError: (err, newRecipe, context) => {
+      queryClient.setQueryData(['recipes'], context.previousRecipes);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries(['recipes']);
+    },
+  });
+}
+
+
 function useDeleteRecipe() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -342,31 +362,6 @@ function useDeleteRecipe() {
     onSettled: () => {
       queryClient.invalidateQueries(['recipes']);
     },
-  });
-}
-
-
-
-function useDeleteRecipe() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-      mutationFn: async (recipeId) => {
-      const response = await axios.delete(`${baseUrl}/recipes/${recipeId}`);
-      return response.data;
-      },
-      onMutate: async (recipeId) => {
-      await queryClient.cancelQueries(['recipes']);
-      const previousRecipes = queryClient.getQueryData(['recipes']);
-      queryClient.setQueryData(['recipes'], (oldRecipes) => oldRecipes.filter((recipe) => recipe.id !== recipeId));
-      return { previousRecipes };
-      },
-      onError: (err, recipeId, context) => {
-      queryClient.setQueryData(['recipes'], context.previousRecipes);
-      },
-      onSettled: () => {
-      queryClient.invalidateQueries(['recipes']);
-      },
   });
 }
 
