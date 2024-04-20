@@ -298,6 +298,7 @@ function useCreateRecipe() {
 
   return useMutation({
       mutationFn: async (recipe) => {
+          console.log("func -> recipe:",recipe);
           const response = await axios.post(`${baseUrl}/recipes`, recipe);
           return response.data;
       },
@@ -309,10 +310,13 @@ function useCreateRecipe() {
               // Handle the case where there are no previous recipes
               previousRecipes = [];
           }
+          console.log("onmutate",newRecipe);
           queryClient.setQueryData(['recipes'], (oldRecipes) => [...oldRecipes, {...newRecipe, id: 'temp-id'}]);
           return { previousRecipes };
       },
       onError: (err, newRecipe, context) => {
+        
+          console.log("error",newRecipe);
           console.error('Error in creating recipe:', err);  // Debugging line
           console.log('Context in onError:', context);  // Debugging line
           if (context.previousRecipes) {
@@ -326,7 +330,7 @@ function useCreateRecipe() {
 }
 
   
-async function useGetRecipes() {
+function useGetRecipes() {
   return useQuery({
       queryKey: ['recipes'],
       queryFn: async () => {
